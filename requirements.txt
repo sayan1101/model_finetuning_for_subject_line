@@ -1,0 +1,10 @@
+peft==0.4.0
+accelerate==0.21.0
+bitsandbytes==0.40.2
+transformers==4.31.0
+xformers==0.0.21
+trl==0.4.7
+pydantic==1.10.4
+fastapi==0.89.1
+uvicorn==0.20.0
+scipy==1.8.0
