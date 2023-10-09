@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from generation import inference
+import json
+from typing import Optional
 
 app = FastAPI()
 
@@ -30,11 +32,10 @@ class Personalisation(BaseModel):
 class Params(BaseModel):
     prompt: str
     tone: str
-    type: str
-    personalise: Personalisation
-    controller: str
-    brand_name: str
-    action: str
+    type: Optional[str]
+    personalise: str
+    controller: Optional[str]
+    action: Optional[str]
     about_brand: str
 
 class InputPayload(BaseModel):
@@ -57,15 +58,25 @@ def get_subject_prompt(prompt, about_brand, personalise, tone):
     str = ""
     if about_brand != "":
         str = "for a company with about us '{about_brand}'".format(about_brand=about_brand)
-    template = "Create 1 subject line for an email campaign in a {tone} tone about {prompt} {str}. {personalize}.".format(            
+    template = """###Instruction:
+Create 1 subject line for an email campaign in a {tone} tone about {prompt} {str}. {personalise}.
+
+### Response:
+""".format(            
         prompt=prompt,str=str,tone=tone, personalise=personalise)
     return template
 
 @app.post("/generatesubject")
 async def generatesubject(payload: InputPayload):
+    print(payload)
     message = payload.params
-    personalise = personaliseForSubjectLine(message.personalise)
+    print(message)
+    print(message.personalise)
+    personalise = Personalisation.parse_raw(message.personalise)
+    print(personalise)
+    personalised = personaliseForSubjectLine(personalise)
     about_brand = message.about_brand if message.about_brand else ""
-    prompt = get_subject_prompt(message.prompt, about_brand, personalise, tone_map[message.tone])
+    prompt = get_subject_prompt(message.prompt, about_brand, personalised, tone_map[message.tone])
+    print(prompt)
 
     return inference(prompt)

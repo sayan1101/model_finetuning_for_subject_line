@@ -25,7 +25,7 @@ finetuned_model = FinetunedModel(
 )
 
 tokenizer = AutoTokenizer.from_pretrained(
-    REPO_ID,
+    "NousResearch/Nous-Hermes-Llama2-13b",
     trust_remote_code=True
 )
 
@@ -33,9 +33,9 @@ def inference(message: str) -> Dict[str, Union[bool, List[Dict[str, str]]]]:
     responses = []
     for i in range (4):
         model_responses = finetuned_model.generate(
-            model=finetuned_model,
+            # model=finetuned_model,
             message=message,
-            tokenizer=tokenizer,
+            # tokenizer=tokenizer,
             max_new_tokens=100,
             temperature=0.9,
             num_return_sequences=1,
@@ -44,7 +44,7 @@ def inference(message: str) -> Dict[str, Union[bool, List[Dict[str, str]]]]:
         )
         for response in model_responses:
             # add the response to "text"
-            responses.append({"text": response.split("### Response:")[1].strip()})
+            responses.append({"text": response.strip()[3:]})
 
     output = {
         "status": True,
